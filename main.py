@@ -43,11 +43,6 @@ from app.routers.authentication import authentication
 from app.routers import profile, search, circle, invitation, microservices, group
 app.include_router(authentication.router)
 app.include_router(profile.router)
-# app.include_router(search.router)
-# app.include_router(circle.router)
-# app.include_router(invitation.router)
-# app.include_router(group.router)
-# app.include_router(microservices.router)
 
 
 app.add_middleware(
