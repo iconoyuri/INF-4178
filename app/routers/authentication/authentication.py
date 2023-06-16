@@ -1,16 +1,15 @@
 from fastapi import status,HTTPException, Depends, Request, APIRouter, Query
-from app.schemas import UserRegistrationForm, UserLoginResponse
+from app.schemas import UserRegistrationForm, UserLoginResponse, User
 from fastapi.security import OAuth2PasswordRequestForm
 from app.routers.authentication.token_handler import create_access_token
 from app.routers.authentication.account_activation_handler import AccountActivationHandler
-from py2neo_schemas.nodes import User, Profile
-from app.globals import main_graph ,encodeing, CHAT_SERVER_DOMAIN
+from app.globals import encodeing, client
 from app.functions import encode_password
 from email_validator import validate_email, EmailNotValidError
 from passlib.context import CryptContext
-import requests
 from typing import Union
 from app.functions import encode_content
+from bson.objectid import ObjectId
 
 router = APIRouter(
     prefix = "",
@@ -36,16 +35,14 @@ async def register(regist_form: UserRegistrationForm, request : Request, q: Unio
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Invalid or not existing email"
         )
-
     login = regist_form.login.lower()
     email = regist_form.email.lower()
         
     user = save_user(login, email, regist_form.password)
     try:
         send_activation_mail(user, request)
-        add_user_to_chat_server(login)
     except Exception as e:
-        main_graph.delete(user)
+        client['User'].delete_one({'_id':user.id})
         raise e
     
 
@@ -61,9 +58,9 @@ async def login(
     
     user = find_user(username, login_form.password)
     if user:
-        if user.activated: 
+        if user['activated']: 
             access_token = create_access_token(
-                data={"sub": user.login}
+                data={"sub": username}
             )
             return UserLoginResponse(access_token=access_token, token_type="bearer")
         else: 
@@ -80,7 +77,7 @@ async def login(
 @router.get("/activate/{registration_code}", response_model=None)
 async def activate(registration_code:str,q: Union[str, None] = Query(
                 default=None,
-                description="This API serves to activate an created account, depending on the activation code of the user (doesn't concern frontend team)",
+                description="This API serves to activate a created account, depending on the activation code of the user (doesn't concern frontend team)",
                 )
     ):    
     strd = None
@@ -94,10 +91,9 @@ async def activate(registration_code:str,q: Union[str, None] = Query(
                     status_code=status.HTTP_401_UNAUTHORIZED, 
                     detail="Invalid activation link"
             )
-    user = User.match(main_graph,strd).first()
+    user = client['User'].find_one({'login':strd})
     if user :
-        user.activated = True
-        main_graph.push(user)
+        client['User'].update_one({'login': strd}, {'$set':{'activated':True}})
         raise HTTPException(status_code=status.HTTP_200_OK, detail="Activation succeeded")
     else: 
         raise HTTPException(
@@ -105,24 +101,21 @@ async def activate(registration_code:str,q: Union[str, None] = Query(
                     detail="Invalid activation link"
             )
 
-def add_user_to_chat_server(user_login : str) :
-    r = requests.post(f'{CHAT_SERVER_DOMAIN}/add-user', data={"login": user_login})
-
 def find_user(login, password):
-    user = User.match(main_graph).where(f"_.email = '{login}' OR _.login = '{login}'").first()
+    user = client['User'].find_one({"$or":[{'login':login},{'email':login}]})
     if not user: 
         return False    
 
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    same_password = pwd_context.verify(password, user.password)
+    same_password = pwd_context.verify(password, user['password'])
     if same_password:
         return user 
     else: 
         return None
 
 
-def save_user(login, email, password):
-    user = User.match(main_graph).where(f"_.login = '{login}' OR _.email = '{email}'").first()
+def save_user(login, email, password) -> User:
+    user = client['User'].find_one({"$or":[{'login': login},{'email': email}]})
 
     if user :
         raise HTTPException(
@@ -131,10 +124,11 @@ def save_user(login, email, password):
         )
     else:
         hashed_password = encode_password(password)
-        user = User(login=login, email=email, password = hashed_password, profile_img = None) 
-        profile = Profile()
-        user.profile.add(profile)
-        main_graph.push(user)
+
+        inserted_user = client['User'].insert_one({'login':login,'email':email,'password':hashed_password,'profile_id':None, 'activated':False})
+        inserted_profile = client['Profile'].insert_one({'owner': ObjectId(inserted_user.inserted_id), 'entries': []})
+        client['User'].update_one({'login':login},{'$set':{'profile_id':inserted_profile.inserted_id}})
+        user = User(inserted_user.inserted_id,login,email,password, inserted_profile.inserted_id)
     return user
 
 

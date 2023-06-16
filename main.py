@@ -12,26 +12,6 @@ tags_metadata = [
         "name": "Profile",
         "description": "Operations to get profile informations of a user",
     },
-    # {
-    #     "name": "Search",
-    #     "description": "Operations to search for a group a user based on his identifiers",
-    # },
-    # {
-    #     "name": "Circle",
-    #     "description": "Operations to get the whole list of members of a circle and to look for some other member inside that list",
-    # },
-    # {
-    #     "name": "Invitation",
-    #     "description": "Operations to invite a user to join another one's, accept the invitation, decline it, have a view of all the recived and sent invitations",
-    # },
-    # {
-    #     "name": "Microservices",
-    #     "description": "Operations to communicate with other services (doesn't concern the frontend team)",
-    # },
-    # {
-    #     "name": "Group",
-    #     "description": "Operations to handle groups on the platform, be it creation, deletion, joining, etc",
-    # },
 ]
 app = FastAPI(
     title=APP_NAME,
@@ -40,7 +20,7 @@ app = FastAPI(
 
 
 from app.routers.authentication import authentication
-from app.routers import profile, search, circle, invitation, microservices, group
+from app.routers import profile
 app.include_router(authentication.router)
 app.include_router(profile.router)
 

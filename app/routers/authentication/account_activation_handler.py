@@ -1,7 +1,6 @@
 from fastapi import HTTPException, status, Request
 from .mail_communicator import MailCommunicator
-from typing import List
-from py2neo_schemas.nodes import User
+from app.schemas import User
 from app.globals import APP_NAME
 
 

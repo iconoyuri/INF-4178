@@ -1,24 +1,28 @@
 import os
 from dotenv import load_dotenv
-from fastapi import HTTPException,status
-
-from py2neo import Graph
-
 load_dotenv()
+
 APP_NAME = os.getenv("APP_NAME")
 
-MAIN_GDB_URI = os.getenv("MAIN_GDB_URI")
-MAIN_GDB_USERNAME = os.getenv("MAIN_GDB_USERNAME")
-MAIN_GDB_PASSWORD = os.getenv("MAIN_GDB_PASSWORD")
+DB_USERNAME = os.getenv("DB_USERNAME")
+DB_NAME = os.getenv("DB_NAME")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
-CHAT_SERVER_DOMAIN = os.getenv("CHAT_SERVER_DOMAIN")
 
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+uri = f"mongodb+srv://{DB_USERNAME}:{DB_PASSWORD}@cluster0.jdrid1t.mongodb.net/?retryWrites=true&w=majority"
+
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))[DB_NAME]
+# print(client['collection'].find())
+
+# Send a ping to confirm a successful connection
 try:
-    main_graph = Graph(uri=MAIN_GDB_URI,auth=(MAIN_GDB_USERNAME,MAIN_GDB_PASSWORD))
-except Exception:
-    raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail="The connection to the main database failed"
-    )
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 
 encodeing='utf8'
