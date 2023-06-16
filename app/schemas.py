@@ -34,16 +34,16 @@ class ProfileModel(BaseModel):
     skills: List[SkillModel]
 
 
-class Job(BaseModel):
-    offerer_id:str
-    title:str
-    description:str
-    location:str
-    skills: List[SkillModel]
+class JobModel(BaseModel):
+    id:str = ''
+    offerer:str = ''
+    title:str = ''
+    description:str = ''
+    location:str = ''
+    skills: Optional[List[SkillModel]] = []
     
 
 class UserModel(BaseModel):
-    id:str
     login:str
     email:str
     profile_id:str

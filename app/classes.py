@@ -1,3 +1,4 @@
+from typing import List
 
 class User:
     def __init__(self, login, email, password, activated=False) -> None:
@@ -25,3 +26,12 @@ class Skill:
         self.name : str = name
         self.grade : str = grade
         self.numeric_value : int = numeric_value
+
+class Job:
+    def __init__(self, id:str,offerer:str,title:str,description:str,location:str,skills:List[Skill]) -> None:
+        self.id:str = id
+        self.offerer:str = offerer
+        self.title:str = title
+        self.description:str = description
+        self.location:str = location
+        self.skills:List[Skill] = skills
