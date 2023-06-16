@@ -42,6 +42,12 @@ class JobModel(BaseModel):
     location:str = ''
     skills: Optional[List[SkillModel]] = []
     
+class JobUpdateModel(BaseModel):
+    title:str = ''
+    description:str = ''
+    location:str = ''
+    skills: Optional[List[SkillModel]] = []
+    
 
 class UserModel(BaseModel):
     login:str

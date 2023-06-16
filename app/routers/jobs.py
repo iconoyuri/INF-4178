@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException,status
-from app.schemas import JobModel
+from app.schemas import JobModel, JobUpdateModel
 from app.classes import Job
 from app.routers.authentication.oauth2 import get_current_user
 from app.globals import client
@@ -31,15 +31,14 @@ def get_specific_job(id:str,user_login = Depends(get_current_user)):
     return client['Jobs'].find_one({'_id':ObjectId(id)})
 
 
-@router.delete('/{id}', response_model=Optional[JobModel])
+@router.delete('/{id}')
 def delete_job(id:str,user_login = Depends(get_current_user)):
-    return client['Jobs'].delete_one({'_id':ObjectId(id)})
+    client['Jobs'].delete_one({'_id':ObjectId(id)})
 
 
-@router.put('/{id}', response_model=Optional[JobModel])
-def update_job(job: JobModel, id:str,user_login = Depends(get_current_user)):
+@router.put('/{id}')
+def update_job(job: JobUpdateModel, id:str,user_login = Depends(get_current_user)):
     if len(job.title) <= 0:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Job title can't be empty")
-    client['Jobs'].insert_one(job.dict())
-    return client['Jobs'].update_one({'_id':ObjectId(id)}, {'$set':job.dict().pop('id')})
+    client['Jobs'].update_one({'_id':ObjectId(id)}, {'$set':job.dict()})
 
