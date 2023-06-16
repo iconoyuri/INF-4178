@@ -26,3 +26,6 @@ except Exception as e:
     print(e)
 
 encodeing='utf8'
+
+FRONTEND_DOMAIN = os.getenv("FRONTEND_DOMAIN")
+

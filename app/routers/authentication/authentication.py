@@ -1,10 +1,11 @@
+from starlette.responses import RedirectResponse
 from fastapi import status,HTTPException, Depends, Request, APIRouter, Query
 from app.schemas import UserRegistrationForm, UserLoginResponse
 from app.classes import User
 from fastapi.security import OAuth2PasswordRequestForm
 from app.routers.authentication.token_handler import create_access_token
 from app.routers.authentication.account_activation_handler import AccountActivationHandler
-from app.globals import encodeing, client
+from app.globals import encodeing, client, FRONTEND_DOMAIN
 from app.functions import encode_password
 from email_validator import validate_email, EmailNotValidError
 from passlib.context import CryptContext
@@ -44,6 +45,7 @@ async def register(regist_form: UserRegistrationForm, request : Request, q: Unio
         send_activation_mail(user, request)
     except Exception as e:
         client['User'].delete_one({'_id':user.id})
+        client['Profile'].delete_one({'owner':user.id})
         raise e
     
 
@@ -95,7 +97,8 @@ async def activate(registration_code:str,q: Union[str, None] = Query(
     user = client['User'].find_one({'login':strd})
     if user :
         client['User'].update_one({'login': strd}, {'$set':{'activated':True}})
-        raise HTTPException(status_code=status.HTTP_200_OK, detail="Activation succeeded")
+        return RedirectResponse(url=FRONTEND_DOMAIN)
+        # raise HTTPException(status_code=status.HTTP_200_OK, detail="Activation succeeded")
     else: 
         raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, 
@@ -136,7 +139,7 @@ def save_user(login, email, password) -> User:
 def send_activation_mail(user,request):
 
     str_enc = encode_content(user.login)
-    AccountActivationHandler.send_activation_mail(user,str_enc,request)
+    AccountActivationHandler.send_activation_mail(user.login,user.email,str_enc,request)
     return str_enc
     
 def send_update_address_mail(user,new_address,request):
