@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.globals import APP_NAME
-from app.functions import encode_content
 
 tags_metadata = [
     {
@@ -9,20 +8,30 @@ tags_metadata = [
         "description": "Operations to register, login, activate a newly created account",
     },
     {
+        "name": "Details",
+        "description": "CRUD operations various user details",
+    },
+    {
+        "name": "Skills",
+        "description": "CRUD operations for a user's skills",
+    },
+    {
         "name": "Profile",
-        "description": "Operations to get profile informations of a user",
+        "description": "CRUD operations on user profile, (details as skills)",
     },
 ]
 app = FastAPI(
     title=APP_NAME,
-    description="This is the main server of the chat app",
+    description=f"Backend service for the {APP_NAME} application. Yoroshiku onegai shimasu",
     openapi_tags=tags_metadata)
 
 
 from app.routers.authentication import authentication
-from app.routers import profile
+from app.routers import jobs
+from app.routers.profile import profile
 app.include_router(authentication.router)
 app.include_router(profile.router)
+app.include_router(jobs.router)
 
 
 app.add_middleware(
