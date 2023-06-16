@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status, Request
 from .mail_communicator import MailCommunicator
-from app.schemas import User
+from app.classes import User
 from app.globals import APP_NAME
 
 
@@ -8,12 +8,12 @@ from app.globals import APP_NAME
 class AccountActivationHandler:
     
     @classmethod
-    def send_activation_mail(self, user: User, activation_code : str, request : Request) -> bool:
+    def send_activation_mail(self, login: str, email:str, activation_code : str, request : Request) -> bool:
         
         activation_link = request.url.scheme + "://" + request.url.netloc + "/activate/" + activation_code
-        templates = self.generate_activation_mail(user, activation_link)
+        templates = self.generate_activation_mail(login, activation_link)
         subject=f"[{APP_NAME}] Account activation"
-        recipient=user.email
+        recipient=email
         try:
             MailCommunicator.send_mail(recipient, subject, templates)
         except:
@@ -23,10 +23,10 @@ class AccountActivationHandler:
             )
 
     @classmethod
-    def send_update_address_mail(self, user: User, activation_code : str, recipient_address: str, request : Request) -> bool:
+    def send_update_address_mail(self, login: str, activation_code : str, recipient_address: str, request : Request) -> bool:
         
         activation_link = request.url.scheme + "://" + request.url.netloc + "/dashboard/profile/email/confirm/" + activation_code
-        templates = self.generate_update_address_mail(user, activation_link)
+        templates = self.generate_update_address_mail(login, activation_link)
         subject=f"[{APP_NAME}] Account email address update"
         recipient=recipient_address
         try:
@@ -38,19 +38,19 @@ class AccountActivationHandler:
             )
 
     @classmethod
-    def generate_activation_mail(self, user:User, activation_link : str) -> dict:
+    def generate_activation_mail(self, login:str, activation_link : str) -> dict:
         # return the mail created
         
         html_template = f"""
         <div class="container" style="text-align: center;">
-            <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">Hello <span style="font-weight: bold; text-transform: capitalize;">{user.login}</span></p>
+            <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">Hello <span style="font-weight: bold; text-transform: capitalize;">{login}</span></p>
             <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">There is one last step to get your account on {APP_NAME}. Just click on this activation button</p>
 
             <a href="{activation_link}"><button style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 1.5rem; background-color: rgb(0, 195, 255); padding: 0.7rem 1rem; color: white; border: 0; border-radius: 4px; box-shadow: 0 0 4px #ccc;">Activate account</button></a>
         </div>
 		"""
         text_template = f"""
-            Hello {user.login}
+            Hello {login}
             There is one last step to get your account on {APP_NAME}. Just click on this activation link
             You can also copy it and paste it in your navigator's address bar
             
@@ -62,19 +62,19 @@ class AccountActivationHandler:
         }
         
     @classmethod
-    def generate_update_address_mail(self, user:User, update_address_link : str) -> dict:
+    def generate_update_address_mail(self, login:str, update_address_link : str) -> dict:
         
         html_template = f"""
             <div class="container" style="text-align: center;">
-                <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">Hello <span style="font-weight: bold; text-transform: capitalize;">{user.login}</span></p>
-                <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">You've attempted to replace your {APP_NAME} account email address by this one. Click on the link bellow to validate it, of just ignore it if you are not {user.login}</p>
+                <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">Hello <span style="font-weight: bold; text-transform: capitalize;">{login}</span></p>
+                <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-align: center; font-size: 1.5rem;">You've attempted to replace your {APP_NAME} account email address by this one. Click on the link bellow to validate it, of just ignore it if you are not {login}</p>
 
                 <a href="{update_address_link}"><button style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 1.5rem; background-color: rgb(0, 195, 255); padding: 0.7rem 1rem; color: white; border: 0; border-radius: 4px; box-shadow: 0 0 4px #ccc;">Update Address</button></a>
             </div>
 		"""
         text_template = f"""
-            Hello {user.login}
-            You've attempted to replace your {APP_NAME} account email address by this one. Click on the link bellow to validate it, of just ignore it if you are not {user.login}
+            Hello {login}
+            You've attempted to replace your {APP_NAME} account email address by this one. Click on the link bellow to validate it, of just ignore it if you are not {login}
             
             {update_address_link}
 		"""

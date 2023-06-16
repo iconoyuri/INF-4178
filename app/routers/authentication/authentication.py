@@ -1,5 +1,6 @@
 from fastapi import status,HTTPException, Depends, Request, APIRouter, Query
-from app.schemas import UserRegistrationForm, UserLoginResponse, User
+from app.schemas import UserRegistrationForm, UserLoginResponse
+from app.classes import User
 from fastapi.security import OAuth2PasswordRequestForm
 from app.routers.authentication.token_handler import create_access_token
 from app.routers.authentication.account_activation_handler import AccountActivationHandler
@@ -133,16 +134,14 @@ def save_user(login, email, password) -> User:
 
 
 def send_activation_mail(user,request):
+
     str_enc = encode_content(user.login)
     AccountActivationHandler.send_activation_mail(user,str_enc,request)
+    return str_enc
     
 def send_update_address_mail(user,new_address,request):
-    import base64
 
-    strc = new_address
-    str_enc = strc.encode(encodeing)
-    str_enc = base64.b64encode(str_enc)
-    str_enc = str_enc.decode(encodeing)
-
+    str_enc = encode_content(new_address)
     AccountActivationHandler.send_update_address_mail(user,str_enc,new_address,request)
+    return str_enc
     
