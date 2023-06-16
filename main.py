@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.globals import APP_NAME
+from app.classes import Details, Profile, User,Skill
 
 tags_metadata = [
     {

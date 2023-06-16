@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 
-#-------------------------------------    AUTHENTICATION     -------------------------------
 
 class UserRegistrationForm(BaseModel):
     login: str
@@ -15,32 +14,33 @@ class UserLoginResponse(BaseModel):
     token_type: str
 
 
-class Skill(BaseModel):
+class SkillModel(BaseModel):
     name: str
     grade: Optional[str]
-    numeric_value: Optional[str]
+    numeric_value: Optional[int] = 1
 
 
 class DetailsModel(BaseModel):
-    first_name:str
-    last_name:str
-    country:str
-    language:str
-    bio:str
+    first_name:Optional[str] = ''
+    last_name:Optional[str] = ''
+    country:Optional[str] = ''
+    language:Optional[str] = ''
+    bio:Optional[str] = ''
 
 
-class Profile(BaseModel):
+class ProfileModel(BaseModel):
     owner: str
-    details:DetailsModel
-    skills: List[Skill]
+    details: DetailsModel
+    skills: List[SkillModel]
 
 
 class Job(BaseModel):
-    offerer:str
+    offerer_id:str
     title:str
     description:str
-    profile:Profile
-    # profile:List[dict]
+    location:str
+    skills: List[SkillModel]
+    
 
 class UserModel(BaseModel):
     id:str

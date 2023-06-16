@@ -1,7 +1,7 @@
 from starlette.responses import RedirectResponse
 from fastapi import status,HTTPException, Depends, Request, APIRouter, Query
 from app.schemas import UserRegistrationForm, UserLoginResponse
-from app.classes import User
+from app.classes import User, Profile
 from fastapi.security import OAuth2PasswordRequestForm
 from app.routers.authentication.token_handler import create_access_token
 from app.routers.authentication.account_activation_handler import AccountActivationHandler
@@ -11,7 +11,6 @@ from email_validator import validate_email, EmailNotValidError
 from passlib.context import CryptContext
 from typing import Union
 from app.functions import encode_content
-from bson.objectid import ObjectId
 
 router = APIRouter(
     prefix = "",
@@ -40,12 +39,13 @@ async def register(regist_form: UserRegistrationForm, request : Request, q: Unio
     login = regist_form.login.lower()
     email = regist_form.email.lower()
         
-    user = save_user(login, email, regist_form.password)
+    user = None
     try:
+        user = save_user(login, email, regist_form.password)
         send_activation_mail(user, request)
     except Exception as e:
-        client['User'].delete_one({'_id':user.id})
-        client['Profile'].delete_one({'owner':user.id})
+        client['User'].delete_one({'login':login})
+        client['Profile'].delete_one({'owner':login})
         raise e
     
 
@@ -98,7 +98,6 @@ async def activate(registration_code:str,q: Union[str, None] = Query(
     if user :
         client['User'].update_one({'login': strd}, {'$set':{'activated':True}})
         return RedirectResponse(url=FRONTEND_DOMAIN)
-        # raise HTTPException(status_code=status.HTTP_200_OK, detail="Activation succeeded")
     else: 
         raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, 
@@ -128,11 +127,9 @@ def save_user(login, email, password) -> User:
         )
     else:
         hashed_password = encode_password(password)
-
-        inserted_user = client['User'].insert_one({'login':login,'email':email,'password':hashed_password,'profile_id':None, 'activated':False})
-        inserted_profile = client['Profile'].insert_one({'owner': ObjectId(inserted_user.inserted_id), 'entries': []})
-        client['User'].update_one({'login':login},{'$set':{'profile_id':inserted_profile.inserted_id}})
-        user = User(inserted_user.inserted_id,login,email,password, inserted_profile.inserted_id)
+        user = User(login, email, hashed_password)
+        client['User'].insert_one(user.__dict__)
+        client['Profile'].insert_one(Profile(login).__dict__)
     return user
 
 
