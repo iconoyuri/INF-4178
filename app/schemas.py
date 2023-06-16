@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr
-from typing import List
 
 #-------------------------------------    AUTHENTICATION     -------------------------------
 
@@ -12,22 +11,30 @@ class UserRegistrationForm(BaseModel):
 class UserLoginResponse(BaseModel):
     access_token: str
     token_type: str
-    
-#-------------------------------------    ENTITIES     -------------------------------
-
-
-
-class User(BaseModel):
-    id:str
-    login:str
-    email:str
-    profile_id:str
-
-class Profile(BaseModel):
-    owner:str
-    entries:List[dict]
 
 class ProfileEntry(BaseModel):
     key: str
     value: str
 
+
+
+class User:
+    def __init__(self,id, login, email, password,profile_id) -> None:
+        self.id = id
+        self.login = login
+        self.email = email
+        self.password = password
+        self.profile_id = profile_id
+
+class Profile:
+    def __init__(self, owner) -> None:
+        self.owner = owner
+        self.entries = []
+
+    def add_entry(self,entry):
+        self.entries.append(entry)
+
+# class ProfileEntry:
+#     def __init__(self, key:str,value:str) -> None:
+#         self.key = key
+#         self.value = value
