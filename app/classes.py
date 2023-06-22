@@ -42,7 +42,7 @@ class Job:
 
 
 class Application:
-    def __init__(self,user_login:str, job_id:str, job_title:str = "") -> None:
+    def __init__(self,applicant_login:str, job_id:str, job_title:str = "") -> None:
         self.job_id:str = job_id
         self.job_title:str = job_title
-        self.user_login:str = user_login
+        self.applicant_login:str = applicant_login

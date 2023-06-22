@@ -49,6 +49,9 @@ def update_job(job: JobUpdateModel, id:str,user_login = Depends(get_current_user
 
 
 from app.routers.jobs import application
+from app.routers.jobs import worker
 
 router.include_router(application.router)
+
+router.include_router(worker.router)
 
