@@ -28,10 +28,12 @@ class Skill:
         self.numeric_value : int = numeric_value
 
 class Job:
-    def __init__(self, id:str,offerer:str,title:str,description:str,location:str,skills:List[Skill]) -> None:
+    statuses = ['Actif', 'Terminé']
+    def __init__(self, id:str,offerer:str,title:str,description:str,location:str,skills:List[Skill], status:str) -> None:
         self.id:str = id
         self.offerer:str = offerer
         self.title:str = title
         self.description:str = description
         self.location:str = location
         self.skills:List[Skill] = skills
+        self.status:str = status

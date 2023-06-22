@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException,status
-from app.schemas import JobModel, JobUpdateModel
+from app.schemas import JobModel, JobUpdateModel, JobCreationModel
 from app.classes import Job
 from app.routers.authentication.oauth2 import get_current_user
 from app.globals import client
@@ -12,17 +12,20 @@ router = APIRouter(
 )
 
 
+
 @router.post('/')
-def publish_job(job: JobModel, user_login = Depends(get_current_user)):
+def publish_job(job: JobCreationModel, user_login = Depends(get_current_user)):
     if len(job.title) <= 0:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Job title can't be empty")
-    job.offerer = user_login
-    client['Jobs'].insert_one(job.dict())
+    _job = job.dict()
+    _job['offerer'] = user_login
+    _job['status'] = Job.statuses[0]
+    client['Jobs'].insert_one(_job)
 
 
 @router.get('/all', response_model=Optional[List[JobModel]])
 def get_posted_jobs(user_login = Depends(get_current_user)):
-    jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills']).__dict__ for job in client['Jobs'].find({'offerer':user_login})]
+    jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status']).__dict__ for job in client['Jobs'].find({'offerer':user_login})]
     return jobs
 
 
