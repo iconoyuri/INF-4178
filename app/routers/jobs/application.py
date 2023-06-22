@@ -36,6 +36,16 @@ def delete_application_to_job(job_id:str, applicant_login:str, user_login = Depe
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Only the owner of the job can delete an application")
 
+@router.put('/{job_id}/{applicant_login}')
+def accept_application_to_job(job_id:str, applicant_login:str, user_login = Depends(get_current_user)):
+    job = client['Jobs'].find_one({"_id":ObjectId(job_id)})
+    if job['offerer'] == user_login:
+        client['Jobs'].update_one({"_id":ObjectId(job_id), 'offerer': user_login}, {'$pull': {'applications': {"user_login": applicant_login}}})
+        client['Jobs'].update_one({"_id":ObjectId(job_id), 'offerer': user_login}, {'$addToSet': {'wokers': Application(applicant_login,job_id, job['title'])}})
+    else:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Only the owner of the job can accept an application")
+
+
 @router.get('/{job_id}', response_model=ApplicationModel)
 def get_job_applicants(job_id:str, user_login = Depends(get_current_user)):
     return client['Jobs'].find_one({"_id":ObjectId(job_id)})['applications']
