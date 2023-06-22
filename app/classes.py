@@ -20,6 +20,7 @@ class Profile:
         self.owner : str = owner
         self.details : dict = Details().__dict__
         self.skills : Skill = []
+        self.applications: List[Application] = []
 
 class Skill:
     def __init__(self, name='', grade='', numeric_value=1) -> None:
@@ -38,3 +39,10 @@ class Job:
         self.skills:List[Skill] = skills
         self.status:str = status
         self.applicants:List = applicants
+
+
+class Application:
+    def __init__(self,user_login:str, job_id:str, job_title:str = "") -> None:
+        self.job_id:str = job_id
+        self.job_title:str = job_title
+        self.user_login:str = user_login

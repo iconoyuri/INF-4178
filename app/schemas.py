@@ -64,3 +64,9 @@ class UserModel(BaseModel):
     login:str
     email:str
     profile_id:str
+
+
+class ApplicationModel(BaseModel):
+    job_id:str
+    job_title:str
+    user_login:str
