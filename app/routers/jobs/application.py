@@ -18,3 +18,9 @@ def apply_for_a_job(job_id:str, user_login = Depends(get_current_user)):
 @router.delete('/{job_id}')
 def delete_application_to_job(job_id:str, user_login = Depends(get_current_user)):
     client['Jobs'].update_one({"_id":ObjectId(job_id)}, {'$pull': {'applicants': {"user": user_login}}})
+
+
+@router.get('/{job_id}/applicants')
+def get_job_applicants(job_id:str, user_login = Depends(get_current_user)):
+    return client['Jobs'].find_one({"_id":ObjectId(job_id)})['applicants']
+    
