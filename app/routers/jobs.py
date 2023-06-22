@@ -44,5 +44,7 @@ def delete_job(id:str,user_login = Depends(get_current_user)):
 def update_job(job: JobUpdateModel, id:str,user_login = Depends(get_current_user)):
     if len(job.title) <= 0:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Job title can't be empty")
+    if job.status not in Job.statuses:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Job status must be in set {set(Job.statuses)}")
     client['Jobs'].update_one({'_id':ObjectId(id)}, {'$set':job.dict()})
 
