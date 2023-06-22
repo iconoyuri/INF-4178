@@ -31,12 +31,17 @@ def get_posted_jobs(user_login = Depends(get_current_user)):
 
 @router.get('/{id}', response_model=Optional[JobModel])
 def get_specific_job(id:str,user_login = Depends(get_current_user)):
-    return client['Jobs'].find_one({'_id':ObjectId(id)})
+    job = client['Jobs'].find_one({'_id':ObjectId(id)})
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unexistant job")
+    return job
 
 
 @router.delete('/{id}')
 def delete_job(id:str,user_login = Depends(get_current_user)):
-    client['Jobs'].delete_one({'_id':ObjectId(id)})
+    result = client['Jobs'].delete_one({'_id':ObjectId(id)})
+    if result.deleted_count != 1:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
 
 
 @router.put('/{id}')

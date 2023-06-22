@@ -69,4 +69,4 @@ class UserModel(BaseModel):
 class ApplicationModel(BaseModel):
     job_id:str
     job_title:str
-    user_login:str
+    applicant_login:str
