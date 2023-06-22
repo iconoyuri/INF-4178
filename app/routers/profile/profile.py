@@ -5,7 +5,7 @@ from app.globals import client
 from typing import Optional
 
 router = APIRouter(
-    prefix='/profile', tags=["Profile"]
+    prefix='/profile', tags=["Profiles"]
 )
 
 

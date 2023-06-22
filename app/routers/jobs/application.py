@@ -8,7 +8,7 @@ from bson.objectid import ObjectId
 from datetime import datetime
 
 router = APIRouter(
-    prefix='/applications', tags=["Application"]
+    prefix='/applications', tags=["Applications"]
 )
 
 @router.post('/new/{job_id}')
