@@ -56,6 +56,7 @@ class JobUpdateModel(BaseModel):
     description:str = ''
     location:str = ''
     skills: Optional[List[SkillModel]] = []
+    status: str
     
 
 class UserModel(BaseModel):
