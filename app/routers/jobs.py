@@ -23,10 +23,11 @@ def publish_job(job: JobCreationModel, user_login = Depends(get_current_user)):
     client['Jobs'].insert_one(_job)
 
 
-@router.get('/all', response_model=Optional[List[JobModel]])
+@router.get('/all', response_model=dict)
 def get_posted_jobs(user_login = Depends(get_current_user)):
-    jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status']).__dict__ for job in client['Jobs'].find({'offerer':user_login})]
-    return jobs
+    active_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
+    terminated_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[1]})]
+    return {"active_jobs":active_jobs,"terminated_jobs":terminated_jobs}
 
 
 @router.get('/{id}', response_model=Optional[JobModel])
