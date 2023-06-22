@@ -30,9 +30,11 @@ app = FastAPI(
 from app.routers.authentication import authentication
 from app.routers.jobs import jobs
 from app.routers.profile import profile
+from app.routers import search
 app.include_router(authentication.router)
 app.include_router(profile.router)
 app.include_router(jobs.router)
+app.include_router(search.router)
 
 
 app.add_middleware(

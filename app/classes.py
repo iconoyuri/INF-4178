@@ -1,11 +1,11 @@
 from typing import List
 
 class User:
-    def __init__(self, login, email, password, activated=False) -> None:
-        self.login = login
-        self.email = email
-        self.password = password
-        self.activated = activated
+    def __init__(self, login:str="", email:str="", password:str="", activated=False) -> None:
+        self.login:str = login
+        self.email:str = email
+        self.password:str = password
+        self.activated:bool = activated
 
 class Details:
     def __init__(self, first_name:str='', last_name:str='', country:str='', language:str='', bio:str='') -> None:
@@ -30,7 +30,7 @@ class Skill:
 
 class Job:
     statuses = ['Actif', 'Terminé']
-    def __init__(self, id:str,offerer:str,title:str,description:str,location:str,skills:List[Skill], status:str, applicants:List) -> None:
+    def __init__(self, id:str="",offerer:str="",title:str="",description:str="",location:str="",skills:List[Skill]=None, status:str="", applicants:List=None) -> None:
         self.id:str = id
         self.offerer:str = offerer
         self.title:str = title

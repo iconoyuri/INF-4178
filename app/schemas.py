@@ -13,6 +13,9 @@ class UserLoginResponse(BaseModel):
     access_token: str
     token_type: str
 
+class UserSearchModel(BaseModel):
+    login: str
+
 
 class SkillModel(BaseModel):
     name: str
@@ -57,6 +60,13 @@ class JobUpdateModel(BaseModel):
     description:str = ''
     location:str = ''
     skills: Optional[List[SkillModel]] = []
+    status: str
+    
+class JobSearchModel(BaseModel):
+    id:str = ''
+    title:str = ''
+    description:str = ''
+    offerer:str = ''
     status: str
     
 
