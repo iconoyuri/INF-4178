@@ -29,7 +29,7 @@ class Skill:
 
 class Job:
     statuses = ['Actif', 'Terminé']
-    def __init__(self, id:str,offerer:str,title:str,description:str,location:str,skills:List[Skill], status:str) -> None:
+    def __init__(self, id:str,offerer:str,title:str,description:str,location:str,skills:List[Skill], status:str, applicants:List) -> None:
         self.id:str = id
         self.offerer:str = offerer
         self.title:str = title
@@ -37,3 +37,4 @@ class Job:
         self.location:str = location
         self.skills:List[Skill] = skills
         self.status:str = status
+        self.applicants:List = applicants

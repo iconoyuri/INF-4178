@@ -11,6 +11,9 @@ router = APIRouter(
     prefix='/jobs', tags=["Jobs"]
 )
 
+from app.routers.jobs import application
+
+router.include_router(application.router)
 
 
 @router.post('/')
@@ -20,13 +23,14 @@ def publish_job(job: JobCreationModel, user_login = Depends(get_current_user)):
     _job = job.dict()
     _job['offerer'] = user_login
     _job['status'] = Job.statuses[0]
+    _job['applicants'] = []
     client['Jobs'].insert_one(_job)
 
 
 @router.get('/all', response_model=dict)
 def get_posted_jobs(user_login = Depends(get_current_user)):
-    active_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
-    terminated_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[1]})]
+    active_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
+    terminated_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[1]})]
     return {"active_jobs":active_jobs,"terminated_jobs":terminated_jobs}
 
 

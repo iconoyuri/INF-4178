@@ -28,7 +28,7 @@ app = FastAPI(
 
 
 from app.routers.authentication import authentication
-from app.routers import jobs
+from app.routers.jobs import jobs
 from app.routers.profile import profile
 app.include_router(authentication.router)
 app.include_router(profile.router)

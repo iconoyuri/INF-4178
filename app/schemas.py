@@ -41,7 +41,8 @@ class JobModel(BaseModel):
     description:str = ''
     location:str = ''
     skills: Optional[List[SkillModel]] = []
-    status: str
+    status: str = 'Actif'
+    applicants: List
 
 
 class JobCreationModel(BaseModel):
