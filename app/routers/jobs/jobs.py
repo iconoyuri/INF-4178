@@ -11,11 +11,6 @@ router = APIRouter(
     prefix='/jobs', tags=["Jobs"]
 )
 
-from app.routers.jobs import application
-
-router.include_router(application.router)
-
-
 @router.post('/')
 def publish_job(job: JobCreationModel, user_login = Depends(get_current_user)):
     if len(job.title) <= 0:
@@ -51,4 +46,9 @@ def update_job(job: JobUpdateModel, id:str,user_login = Depends(get_current_user
     if job.status not in Job.statuses:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"Job status must be in set {set(Job.statuses)}")
     client['Jobs'].update_one({'_id':ObjectId(id)}, {'$set':job.dict()})
+
+
+from app.routers.jobs import application
+
+router.include_router(application.router)
 
