@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 @router.get('/job/', response_model=List[JobModel])
-def get_specific_job(user_login = Depends(get_current_user)):
+def get_interesting_jobs(user_login = Depends(get_current_user)):
 
     jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],[Skill(skill['name'],skill['grade'],skill['numeric_value']) for skill in job['skills']], job['status'], job['applicants']) for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
     # jobs_skills = [[skill.name for skill in job.skills] for job in jobs]
