@@ -24,8 +24,10 @@ def publish_job(job: JobCreationModel, user_login = Depends(get_current_user)):
 
 @router.get('/all', response_model=dict)
 def get_posted_jobs(user_login = Depends(get_current_user)):
-    active_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
-    terminated_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[1]})]
+    active_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],[Skill(skill['name'],skill['grade'],skill['numeric_value']) for skill in job['skills']], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
+    # active_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[0]})]
+    terminated_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],[Skill(skill['name'],skill['grade'],skill['numeric_value']) for skill in job['skills']], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[1]})]
+    # terminated_jobs = [Job(str(job['_id']),job['offerer'],job['title'],job['description'],job['location'],job['skills'], job['status'], job['applicants']).__dict__ for job in client['Jobs'].find({'offerer':user_login, 'status': Job.statuses[1]})]
     return {"active_jobs":active_jobs,"terminated_jobs":terminated_jobs}
 
 
