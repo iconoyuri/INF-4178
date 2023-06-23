@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException,status
 from app.schemas import JobModel, JobUpdateModel, JobCreationModel
-from app.classes import Job
+from app.classes import Job, Skill
 from app.routers.authentication.oauth2 import get_current_user
 from app.globals import client
 from typing import Optional, List
