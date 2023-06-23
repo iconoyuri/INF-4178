@@ -43,7 +43,7 @@ class JobModel(BaseModel):
     title:str = ''
     description:str = ''
     location:str = ''
-    skills: Optional[List[SkillModel]] = []
+    skills: Optional[List[SkillModel]]
     status: str = 'Actif'
     applicants: List
 
@@ -52,14 +52,14 @@ class JobCreationModel(BaseModel):
     title:str = ''
     description:str = ''
     location:str = ''
-    skills: Optional[List[SkillModel]] = []
+    skills: Optional[List[SkillModel]]
 
     
 class JobUpdateModel(BaseModel):
     title:str = ''
     description:str = ''
     location:str = ''
-    skills: Optional[List[SkillModel]] = []
+    skills: Optional[List[SkillModel]]
     status: str
     
 class JobSearchModel(BaseModel):
